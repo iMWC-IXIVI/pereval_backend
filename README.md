@@ -13,3 +13,7 @@
 > copy .env.example .env - копирование .env файла
 
 > start .env - изменение .env файла
+
+> cd app - переходим в папку с проектом
+
+> uvicorn main:app --reload - запуск сервера
