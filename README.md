@@ -17,3 +17,7 @@
 > cd app - переходим в папку с проектом
 
 > uvicorn main:app --reload - запуск сервера
+
+> alembic revision --autogenerate -m "some message" - создание миграций
+
+> alembic upgrade head - накат миграций
