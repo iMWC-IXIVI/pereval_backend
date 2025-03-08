@@ -20,10 +20,10 @@ class Level(Base):
     __tablename__ = 'levels'
 
     id = Column(Integer, primary_key=True, comment='Идентификатор')
-    winter = Column(Enum(LevelPereval), nullable=False, server_default=LevelPereval.NC.value, comment='Зимнее время')
-    summer = Column(Enum(LevelPereval), nullable=False, server_default=LevelPereval.NC.value, comment='Летнее время')
-    spring = Column(Enum(LevelPereval), nullable=False, server_default=LevelPereval.NC.value, comment='Весеннее время')
-    autumn = Column(Enum(LevelPereval), nullable=False, server_default=LevelPereval.NC.value, comment='Осеннее время')
+    winter = Column(Enum(LevelPereval), nullable=False, default=LevelPereval.NC, comment='Зимнее время')
+    summer = Column(Enum(LevelPereval), nullable=False, default=LevelPereval.NC, comment='Летнее время')
+    spring = Column(Enum(LevelPereval), nullable=False, default=LevelPereval.NC, comment='Весеннее время')
+    autumn = Column(Enum(LevelPereval), nullable=False, default=LevelPereval.NC, comment='Осеннее время')
 
     pereval = relationship('Pereval', back_populates='level', uselist=False, cascade='all, delete', passive_deletes=True)
 
