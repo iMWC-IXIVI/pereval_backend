@@ -28,10 +28,12 @@ class Pereval(Base):
     user = relationship('User', back_populates='perevals')
 
     coord_id = Column(Integer, ForeignKey('coords.id', ondelete='CASCADE'), nullable=False, comment='Идентификатор координат')
-    coord = relationship('Coord', back_populates='pereval')
+    coord = relationship('Coord', back_populates='pereval', uselist=False)
 
     level_id = Column(Integer, ForeignKey('levels.id', ondelete='CASCADE'), nullable=False, comment='Идентификатор уровней')
-    level = relationship('Level', back_populates='pereval')
+    level = relationship('Level', back_populates='pereval', uselist=False)
+
+    images_pereval = relationship('ImagePereval', back_populates='pereval', cascade='all, delete', passive_deletes=True)
 
     def __repr__(self):
         return f'Pereval(id={self.id}, title={self.title})'
