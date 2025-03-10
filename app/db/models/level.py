@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship
 from .base import Base
 
 
-class LevelPereval(PyEnum):
+class LevelPereval(str, PyEnum):
     A1 = 'A1'
     A2 = 'A2'
     A3 = 'A3'
