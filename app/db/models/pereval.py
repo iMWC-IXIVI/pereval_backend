@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship
 from .base import Base
 
 
-class StatusPereval(PyEnum):
+class StatusPereval(str, PyEnum):
     NEW = 'new'
     PEN = 'pending'
     ACC = 'accepted'
