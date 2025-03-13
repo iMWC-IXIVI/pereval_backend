@@ -2,7 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from app.db.models import LevelPereval
+from db.models import LevelPereval
 
 
 class LevelBase(BaseModel):
