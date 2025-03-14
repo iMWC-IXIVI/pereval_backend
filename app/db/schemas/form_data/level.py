@@ -8,7 +8,7 @@ from db.models import LevelPereval
 
 @dataclass
 class LevelBaseFD:
-    winter: Optional[LevelPereval] = Form(None)
-    summer: Optional[LevelPereval] = Form(None)
-    autumn: Optional[LevelPereval] = Form(None)
-    spring: Optional[LevelPereval] = Form(None)
+    winter: LevelPereval = Form(...)
+    summer: LevelPereval = Form(...)
+    autumn: LevelPereval = Form(...)
+    spring: LevelPereval = Form(...)

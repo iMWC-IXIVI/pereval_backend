@@ -14,4 +14,5 @@ async def coord_create(db: AsyncSession, coord_data: CoordBaseFD):
 
     await db.commit()
     await db.refresh(coord)
+
     return coord

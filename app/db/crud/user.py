@@ -21,6 +21,7 @@ async def user_create(db: AsyncSession, user_data: UserBaseFD):
     try:
         await db.commit()
         await db.refresh(user)
+
         return user
     except IntegrityError as e:
         await db.rollback()
