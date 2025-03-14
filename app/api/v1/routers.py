@@ -8,5 +8,5 @@ router = APIRouter(prefix='/v1')
 
 @router.post('/create/')
 async def create(data: PerevalBaseFD = Depends()):
-    print(data)
+    print(f'{data}')
     return {'message': 'success'}

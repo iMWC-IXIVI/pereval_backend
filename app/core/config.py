@@ -1,11 +1,13 @@
 from pydantic_settings import BaseSettings
 
+from dotenv import load_dotenv
+
+
+load_dotenv()
+
 
 class Settings(BaseSettings):
-    class Database:
-        DB_URL: str
-
-    database: Database
+    DB_URL: str
 
     class Config:
         env_file = '.env'

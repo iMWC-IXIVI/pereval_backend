@@ -23,3 +23,7 @@ class PerevalBaseFD:
     user: UserBaseFD = Depends()
     coord: CoordBaseFD = Depends()
     level: LevelBaseFD = Depends()
+
+
+class PerevalCreateFD(PerevalBaseFD):
+    pass
