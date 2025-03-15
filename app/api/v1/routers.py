@@ -7,11 +7,11 @@ from db.crud import image_create, pereval_create, image_pereval_create
 from db.session import get_db
 
 
-router = APIRouter(prefix='/v1')
+router = APIRouter(prefix='/submitData')
 
 
-@router.post('/create/')
-async def create(db: AsyncSession = Depends(get_db), data: PerevalBaseFD = Depends()):
+@router.post('/')
+async def submit_data(db: AsyncSession = Depends(get_db), data: PerevalBaseFD = Depends()):
     list_image = []
     for image, title in zip(data.image_data, data.image_title):
         list_image.append(ImageBaseFD(data=image, title=title))
