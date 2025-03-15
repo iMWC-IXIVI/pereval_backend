@@ -4,7 +4,7 @@ from typing import Tuple
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from db.models import Image
+from db.models import Image, ImagePereval, Pereval
 from db.schemas.form_data import ImageBaseFD
 
 from core import settings
@@ -40,3 +40,16 @@ async def image_create(db: AsyncSession, image_data: Tuple[ImageBaseFD]):
         result_image.append(image)
 
     return result_image
+
+
+async def image_pereval_create(db: AsyncSession, image_data: Tuple[Image], pereval_data: Pereval):
+    for image in image_data:
+        image_pereval = ImagePereval(
+            pereval_id=pereval_data.id,
+            image_id=image.id
+        )
+
+        db.add(image_pereval)
+
+        await db.commit()
+        await db.refresh(image_pereval)
