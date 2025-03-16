@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, Path
+from typing import List
+
+from fastapi import APIRouter, Depends, Path, Query
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -8,7 +10,7 @@ from db.schemas.form_data import PerevalBaseFD, ImageBaseFD
 from db.schemas.json import PerevalRead, ImageRead
 from db.crud import image_create, pereval_create, image_pereval_create
 from db.session import get_db
-from db.models import Pereval, ImagePereval
+from db.models import Pereval, ImagePereval, User
 
 
 router = APIRouter(prefix='/submitData')
@@ -42,3 +44,24 @@ async def submit_data_detail(pk: int = Path(..., title='Primary key', ge=1), db:
     pereval_dict.image = images
 
     return pereval_dict
+
+
+@router.get('', response_model=List[PerevalRead])
+async def get_user(user_email: str = Query(..., title='User email'), db: AsyncSession = Depends(get_db)):
+    query = select(Pereval).join(Pereval.user).where(User.email == user_email).options(
+        selectinload(Pereval.coord),
+        selectinload(Pereval.level),
+        selectinload(Pereval.user),
+        selectinload(Pereval.images_pereval).selectinload(ImagePereval.image)
+    )
+    result = await db.execute(query)
+    result = result.scalars().all()
+
+    result_list = []
+    for pereval in result:
+        images = [ImageRead.model_validate(image.image) for image in pereval.images_pereval]
+        pereval_dict = PerevalRead.model_validate(pereval)
+        pereval_dict.image = images
+        result_list.append(pereval_dict)
+
+    return result_list
