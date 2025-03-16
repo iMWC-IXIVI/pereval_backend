@@ -1,14 +1,11 @@
 from datetime import datetime
 
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel
 
 from db.models import StatusPereval
-from .user import UserBase
-from .coord import CoordBase
-from .level import LevelBase
-from .image import ImageBase
+from db.schemas.json import UserBase, UserRead, CoordBase, CoordRead, LevelBase, LevelRead, ImageBase, ImageRead
 
 
 class PerevalBase(BaseModel):
@@ -21,7 +18,7 @@ class PerevalBase(BaseModel):
     user: UserBase
     coord: CoordBase
     level: LevelBase
-    image: List[ImageBase]
+    image: Optional[List[ImageBase]] = None
 
 
 class PerevalCreate(PerevalBase):
@@ -35,6 +32,11 @@ class PerevalUpdate(PerevalBase):
 class PerevalRead(PerevalBase):
     id: int
     status: StatusPereval
+
+    user: UserRead
+    coord: CoordRead
+    level: LevelRead
+    image: Optional[List[ImageRead]] = None
 
     class Config:
         from_attributes = True

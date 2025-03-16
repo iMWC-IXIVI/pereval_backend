@@ -1,10 +1,8 @@
-from fastapi import UploadFile
-
 from pydantic import BaseModel
 
 
 class ImageBase(BaseModel):
-    data: UploadFile
+    data: str
     title: str
 
 
