@@ -1,4 +1,4 @@
-from .pereval import PerevalCreate, PerevalRead, PerevalUpdate
+from .pereval import PerevalRead
 from .user import UserBase, UserRead
 from .coord import CoordBase, CoordRead
 from .level import LevelBase, LevelRead

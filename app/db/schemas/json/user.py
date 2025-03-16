@@ -9,14 +9,6 @@ class UserBase(BaseModel):
     phone: str  # Написать валидатор для телефона с помощью регулярного выражения +7 (***) *** ** **
 
 
-class UserCreate(UserBase):
-    pass
-
-
-class UserUpdate(UserBase):
-    pass
-
-
 class UserRead(UserBase):
     id: int
 

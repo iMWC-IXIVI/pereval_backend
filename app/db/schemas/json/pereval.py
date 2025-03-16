@@ -5,7 +5,11 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 from db.models import StatusPereval
-from db.schemas.json import UserBase, UserRead, CoordBase, CoordRead, LevelBase, LevelRead, ImageBase, ImageRead
+
+from .user import UserBase, UserRead
+from .coord import CoordBase, CoordRead
+from .level import LevelBase, LevelRead
+from .image import ImageBase, ImageRead
 
 
 class PerevalBase(BaseModel):
@@ -19,14 +23,6 @@ class PerevalBase(BaseModel):
     coord: CoordBase
     level: LevelBase
     image: Optional[List[ImageBase]] = None
-
-
-class PerevalCreate(PerevalBase):
-    pass
-
-
-class PerevalUpdate(PerevalBase):
-    pass
 
 
 class PerevalRead(PerevalBase):
