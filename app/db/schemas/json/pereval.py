@@ -16,7 +16,7 @@ class PerevalBase(BaseModel):
     beauty_title: str
     title: str
     other_title: str
-    connect: str
+    connect: Optional[str] = None
     add_time: datetime
 
     user: UserBase
