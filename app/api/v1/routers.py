@@ -83,12 +83,25 @@ async def submit_data_patch(
         pereval_data: PerevalUpdateFD = Depends()
 ):
     try:
-        pereval: Pereval = await pereval_update(db=db, pereval_data=pereval_data, pk=pk)
-        images = await image_list(image_data=pereval_data.image_data, image_title=pereval_data.image_title)
-        await image_update(pereval=pereval, images=images)
+        logger.debug_message(f'Отправляемые данные - pk={pk}, {pereval_data}')
 
+        logger.info_message('Начало изменение перевала!!!')
+        pereval: Pereval = await pereval_update(db=db, pereval_data=pereval_data, pk=pk)
+        logger.info_message('Перевал изменён!!!')
+
+        logger.info_message('Создание списка из фотографий!!!')
+        images = await image_list(image_data=pereval_data.image_data, image_title=pereval_data.image_title)
+        logger.info_message('Создание списка завершён!!!')
+
+        logger.info_message('Начало изменений фотографий на сервере!!!')
+        await image_update(pereval=pereval, images=images)
+        logger.info_message('Фотографии успешно изменены!!!')
+
+        logger.info_message('Сохранение данных в бд!!!')
         await db.commit()
+        logger.info_message('Данные успешны изменены!!!')
     except Exception as e:
+        logger.error_message(f'Исключение - {e}')
         return JSONResponse(content={'error': 'can\'t update pereval'}, status_code=400)
 
     return {'message': 'success'}
