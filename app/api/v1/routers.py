@@ -32,25 +32,29 @@ async def submit_data_create(db: AsyncSession = Depends(get_db), data: PerevalBa
         pereval = await pereval_create(db=db, pereval_data=data)
         await image_pereval_create(db=db, image_data=tuple(image), pereval_data=pereval)
     except Exception as e:
-        return JSONResponse(content={'error': 'can"t create pereval'}, status_code=400)
+        return JSONResponse(content={'error': 'can\'t create pereval'}, status_code=400)
 
     return {'detail': 'success'}
 
 
 @router.get('/{pk}', response_model=PerevalRead)
 async def submit_data_detail(pk: int = Path(..., title='Primary key', ge=1), db: AsyncSession = Depends(get_db)):
-    query = select(Pereval).where(Pereval.id == pk).options(
-        selectinload(Pereval.user),
-        selectinload(Pereval.coord),
-        selectinload(Pereval.level),
-        selectinload(Pereval.images_pereval).selectinload(ImagePereval.image)
-    )
-    result = await db.execute(query)
-    pereval = result.scalar_one_or_none()
+    try:
+        query = select(Pereval).where(Pereval.id == pk).options(
+            selectinload(Pereval.user),
+            selectinload(Pereval.coord),
+            selectinload(Pereval.level),
+            selectinload(Pereval.images_pereval).selectinload(ImagePereval.image)
+        )
 
-    images = [ImageRead.model_validate(image.image) for image in pereval.images_pereval]
-    pereval_dict = PerevalRead.model_validate(pereval)
-    pereval_dict.image = images
+        result = await db.execute(query)
+        pereval = result.scalar_one_or_none()
+
+        images = [ImageRead.model_validate(image.image) for image in pereval.images_pereval]
+        pereval_dict = PerevalRead.model_validate(pereval)
+        pereval_dict.image = images
+    except Exception as e:
+        return JSONResponse(content={'error': 'can\'t show detail'}, status_code=400)
 
     return pereval_dict
 
