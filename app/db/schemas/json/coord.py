@@ -7,14 +7,6 @@ class CoordBase(BaseModel):
     height: int
 
 
-class CoordCreate(CoordBase):
-    pass
-
-
-class CoordUpdate(CoordBase):
-    pass
-
-
 class CoordRead(CoordBase):
     id: int
 

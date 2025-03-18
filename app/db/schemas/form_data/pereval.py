@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional, List, Annotated
 from datetime import datetime
 
@@ -23,3 +23,9 @@ class PerevalBaseFD:
     user: UserBaseFD = Depends()
     coord: CoordBaseFD = Depends()
     level: LevelBaseFD = Depends()
+
+
+@dataclass
+class PerevalUpdateFD(PerevalBaseFD):
+    add_time: datetime = field(init=False)
+    user: UserBaseFD = field(init=False)

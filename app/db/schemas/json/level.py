@@ -12,14 +12,6 @@ class LevelBase(BaseModel):
     autumn: Optional[LevelPereval] = None
 
 
-class LevelCreate(LevelBase):
-    pass
-
-
-class LevelUpdate(LevelBase):
-    pass
-
-
 class LevelRead(LevelBase):
     id: int
 
