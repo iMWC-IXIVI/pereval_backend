@@ -40,7 +40,7 @@ async def submit_data_create(db: AsyncSession = Depends(get_db), data: PerevalBa
         await image_pereval_create(db=db, image_data=tuple(image), pereval_data=pereval)
         logger.info_message('Создание записи в ImagesPereval завершилась успешно!!!')
     except Exception as e:
-        logger.error_message(f'По данной причине не удалось создать запись в бд - {e}')
+        logger.error_message(f'Исключение - {e}')
         return JSONResponse(content={'error': 'can\'t create pereval'}, status_code=400)
 
     return {'detail': 'success'}
@@ -49,8 +49,13 @@ async def submit_data_create(db: AsyncSession = Depends(get_db), data: PerevalBa
 @router.get('/{pk}', response_model=PerevalRead, status_code=200)
 async def submit_data_detail(pk: int = Path(..., title='Primary key', ge=1), db: AsyncSession = Depends(get_db)):
     try:
+        logger.debug_message(f'Отправляемые данные - pk={pk}')
+
+        logger.info_message('Начало выдачи данных!!!')
         pereval_dict = await pereval_detail(pk=pk, db=db)
+        logger.info_message('Выдача данных завершена!!!')
     except Exception as e:
+        logger.error_message(f'Исключение - {e}')
         return JSONResponse(content={'error': 'can\'t show detail'}, status_code=400)
 
     return pereval_dict
