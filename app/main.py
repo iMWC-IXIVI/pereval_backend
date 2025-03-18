@@ -8,8 +8,3 @@ app = FastAPI(
     version='1.0.0'
 )
 app.include_router(router=router)
-
-
-@app.get('/')
-def start_project():
-    return {'message': 'success'}
