@@ -1,21 +1,15 @@
-import os
-
 from typing import List
 
 from fastapi import APIRouter, Depends, Path, Query
 from fastapi.responses import JSONResponse
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
-from sqlalchemy.future import select
-
-from core.config import settings
 
 from db.schemas.form_data import PerevalBaseFD, PerevalUpdateFD
-from db.schemas.json import PerevalRead, ImageRead
+from db.schemas.json import PerevalRead
 from db.crud import image_create, pereval_create, image_pereval_create, user_information, pereval_detail, pereval_update, image_update
 from db.session import get_db
-from db.models import Pereval, ImagePereval, Level, Coord
+from db.models import Pereval
 
 from utils import image_list
 
