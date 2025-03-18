@@ -11,6 +11,8 @@ from db.crud import image_create, pereval_create, image_pereval_create, user_inf
 from db.session import get_db
 from db.models import Pereval
 
+from core import logger
+
 from utils import image_list
 
 
@@ -20,12 +22,25 @@ router = APIRouter(prefix='/submitData')
 @router.post('/', response_model=dict, status_code=201)
 async def submit_data_create(db: AsyncSession = Depends(get_db), data: PerevalBaseFD = Depends()):
     try:
-        list_image = await image_list(image_data=data.image_data, image_title=data.image_title)
+        logger.debug_message(f'Отправляемые данные - {data}')
 
+        logger.info_message('Формирование списка фотографий!!!')
+        list_image = await image_list(image_data=data.image_data, image_title=data.image_title)
+        logger.info_message('Функция по созданию списка завершилась успешно!!!')
+
+        logger.info_message('Сохранение фотографии!!!')
         image = await image_create(db=db, image_data=tuple(list_image))
+        logger.info_message('Сохранение фотографии завершилась успешно!!!')
+
+        logger.info_message('Сохранение перевала в базе данных!!!')
         pereval = await pereval_create(db=db, pereval_data=data)
+        logger.info_message('Сохранение перевела завершилась успешно!!!')
+
+        logger.info_message('Создание записи в ImagesPereval!!!')
         await image_pereval_create(db=db, image_data=tuple(image), pereval_data=pereval)
+        logger.info_message('Создание записи в ImagesPereval завершилась успешно!!!')
     except Exception as e:
+        logger.error_message(f'По данной причине не удалось создать запись в бд - {e}')
         return JSONResponse(content={'error': 'can\'t create pereval'}, status_code=400)
 
     return {'detail': 'success'}

@@ -29,7 +29,7 @@ class LoggerAPI:
 
         fmt = logging.Formatter('[FILE] %(asctime)s | %(levelname)s | %(message)s', '%H:%M:%S')
         handler = logging.FileHandler(
-            filename=os.path.join(settings.BASE_DIR, 'api_logger.log'),
+            filename=os.path.join(settings.BASE_DIR, 'loggers/api_logger.log'),
             mode='a',
             encoding='utf-8'
         )
