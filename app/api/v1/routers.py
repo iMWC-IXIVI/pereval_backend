@@ -64,8 +64,13 @@ async def submit_data_detail(pk: int = Path(..., title='Primary key', ge=1), db:
 @router.get('', response_model=List[PerevalRead], status_code=200)
 async def get_user(user_email: str = Query(..., title='User email'), db: AsyncSession = Depends(get_db)):
     try:
+        logger.debug_message(f'Отправляемые данные - user_email={user_email}')
+
+        logger.info_message('Начало выдачи данных!!!')
         result_list = await user_information(db=db, user_email=user_email)
+        logger.info_message('Выдача данных завершена!!!')
     except Exception as e:
+        logger.error_message(f'Исключение - {e}')
         return JSONResponse(content={'error': 'can\'t show user information'}, status_code=400)
 
     return result_list
