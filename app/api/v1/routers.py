@@ -61,21 +61,25 @@ async def submit_data_detail(pk: int = Path(..., title='Primary key', ge=1), db:
 
 @router.get('', response_model=List[PerevalRead])
 async def get_user(user_email: str = Query(..., title='User email'), db: AsyncSession = Depends(get_db)):
-    query = select(Pereval).join(Pereval.user).where(User.email == user_email).options(
-        selectinload(Pereval.coord),
-        selectinload(Pereval.level),
-        selectinload(Pereval.user),
-        selectinload(Pereval.images_pereval).selectinload(ImagePereval.image)
-    )
-    result = await db.execute(query)
-    result = result.scalars().all()
+    try:
+        query = select(Pereval).join(Pereval.user).where(User.email == user_email).options(
+            selectinload(Pereval.coord),
+            selectinload(Pereval.level),
+            selectinload(Pereval.user),
+            selectinload(Pereval.images_pereval).selectinload(ImagePereval.image)
+        )
 
-    result_list = []
-    for pereval in result:
-        images = [ImageRead.model_validate(image.image) for image in pereval.images_pereval]
-        pereval_dict = PerevalRead.model_validate(pereval)
-        pereval_dict.image = images
-        result_list.append(pereval_dict)
+        result = await db.execute(query)
+        result = result.scalars().all()
+
+        result_list = []
+        for pereval in result:
+            images = [ImageRead.model_validate(image.image) for image in pereval.images_pereval]
+            pereval_dict = PerevalRead.model_validate(pereval)
+            pereval_dict.image = images
+            result_list.append(pereval_dict)
+    except Exception as e:
+        return JSONResponse(content={'error': 'can\'t show user information'}, status_code=400)
 
     return result_list
 
