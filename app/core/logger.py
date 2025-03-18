@@ -15,7 +15,7 @@ class LoggerAPI:
         self.console_logger.setLevel(logging.DEBUG)
         self.console_logger.propagate = False
 
-        fmt = logging.Formatter('[CONSOLE] %(asctime)s | %(levelname)s | %(message)s', '%H:%M:%S')
+        fmt = logging.Formatter('[CONSOLE - %(filename)s] %(asctime)s | %(levelname)s | %(message)s', '%H:%M:%S')
         handler = logging.StreamHandler(sys.stdout)
         handler.setLevel(logging.DEBUG)
         handler.setFormatter(fmt=fmt)
@@ -27,7 +27,7 @@ class LoggerAPI:
         self.file_logger.setLevel(logging.WARNING)
         self.file_logger.propagate = False
 
-        fmt = logging.Formatter('[FILE] %(asctime)s | %(levelname)s | %(message)s', '%H:%M:%S')
+        fmt = logging.Formatter('[FILE - %(filename)s] %(asctime)s | %(levelname)s | %(message)s', '%H:%M:%S')
         handler = logging.FileHandler(
             filename=os.path.join(settings.BASE_DIR, 'loggers/api_logger.log'),
             mode='a',
