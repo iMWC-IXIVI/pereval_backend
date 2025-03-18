@@ -13,9 +13,9 @@ from core.config import settings
 
 from db.schemas.form_data import PerevalBaseFD, PerevalUpdateFD
 from db.schemas.json import PerevalRead, ImageRead
-from db.crud import image_create, pereval_create, image_pereval_create
+from db.crud import image_create, pereval_create, image_pereval_create, user_information
 from db.session import get_db
-from db.models import Pereval, ImagePereval, User, Level, Coord
+from db.models import Pereval, ImagePereval, Level, Coord
 
 from utils import image_list
 
@@ -62,22 +62,7 @@ async def submit_data_detail(pk: int = Path(..., title='Primary key', ge=1), db:
 @router.get('', response_model=List[PerevalRead], status_code=200)
 async def get_user(user_email: str = Query(..., title='User email'), db: AsyncSession = Depends(get_db)):
     try:
-        query = select(Pereval).join(Pereval.user).where(User.email == user_email).options(
-            selectinload(Pereval.coord),
-            selectinload(Pereval.level),
-            selectinload(Pereval.user),
-            selectinload(Pereval.images_pereval).selectinload(ImagePereval.image)
-        )
-
-        result = await db.execute(query)
-        result = result.scalars().all()
-
-        result_list = []
-        for pereval in result:
-            images = [ImageRead.model_validate(image.image) for image in pereval.images_pereval]
-            pereval_dict = PerevalRead.model_validate(pereval)
-            pereval_dict.image = images
-            result_list.append(pereval_dict)
+        result_list = await user_information(db=db, user_email=user_email)
     except Exception as e:
         return JSONResponse(content={'error': 'can\'t show user information'}, status_code=400)
 

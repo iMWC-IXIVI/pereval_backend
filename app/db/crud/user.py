@@ -2,11 +2,13 @@ from sqlalchemy import or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.future import select
+from sqlalchemy.orm import selectinload
 
 from fastapi import HTTPException
 
 from db.schemas.form_data import UserBaseFD
-from db.models import User
+from db.schemas.json import PerevalRead, ImageRead
+from db.models import User, Pereval, ImagePereval
 
 
 async def user_query(db: AsyncSession, user_data: UserBaseFD):
@@ -41,3 +43,22 @@ async def user_create(db: AsyncSession, user_data: UserBaseFD):
         raise HTTPException(status_code=400, detail='A user with such email or phone number has been created')
 
 
+async def user_information(db: AsyncSession, user_email: str):
+    query = select(Pereval).join(Pereval.user).where(User.email == user_email).options(
+        selectinload(Pereval.coord),
+        selectinload(Pereval.level),
+        selectinload(Pereval.user),
+        selectinload(Pereval.images_pereval).selectinload(ImagePereval.image)
+    )
+
+    result = await db.execute(query)
+    result = result.scalars().all()
+
+    result_list = []
+    for pereval in result:
+        images = [ImageRead.model_validate(image.image) for image in pereval.images_pereval]
+        pereval_dict = PerevalRead.model_validate(pereval)
+        pereval_dict.image = images
+        result_list.append(pereval_dict)
+
+    return result_list
