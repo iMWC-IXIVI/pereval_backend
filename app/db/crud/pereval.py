@@ -2,8 +2,8 @@ from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from db.models import Pereval, ImagePereval
-from db.schemas.form_data import PerevalBaseFD
+from db.models import Pereval, ImagePereval, Coord, Level
+from db.schemas.form_data import PerevalBaseFD, PerevalUpdateFD
 from db.schemas.json import PerevalRead, ImageRead
 
 from db.crud import user_create, coord_create, level_create
@@ -50,3 +50,33 @@ async def pereval_detail(pk:int, db: AsyncSession):
     pereval_dict.image = images
 
     return pereval_dict
+
+
+async def pereval_update(db: AsyncSession, pereval_data: PerevalUpdateFD, pk: int):
+    query = select(Pereval).where(Pereval.id == pk).options(
+        selectinload(Pereval.user),
+        selectinload(Pereval.coord),
+        selectinload(Pereval.level),
+        selectinload(Pereval.images_pereval).selectinload(ImagePereval.image)
+    )
+    result = await db.execute(query)
+    pereval: Pereval = result.scalar_one_or_none()
+
+    coord: Coord = pereval.coord
+    level: Level = pereval.level
+
+    pereval.beauty_title = pereval_data.beauty_title
+    pereval.title = pereval_data.title
+    pereval.other_title = pereval_data.other_title
+    pereval.connect = pereval_data.connect
+
+    coord.latitude = pereval_data.coord.latitude
+    coord.longitude = pereval_data.coord.longitude
+    coord.height = pereval_data.coord.height
+
+    level.winter = pereval_data.level.winter
+    level.summer = pereval_data.level.summer
+    level.autumn = pereval_data.level.autumn
+    level.spring = pereval_data.level.spring
+
+    return pereval

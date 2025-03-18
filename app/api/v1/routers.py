@@ -13,7 +13,7 @@ from core.config import settings
 
 from db.schemas.form_data import PerevalBaseFD, PerevalUpdateFD
 from db.schemas.json import PerevalRead, ImageRead
-from db.crud import image_create, pereval_create, image_pereval_create, user_information, pereval_detail
+from db.crud import image_create, pereval_create, image_pereval_create, user_information, pereval_detail, pereval_update, image_update
 from db.session import get_db
 from db.models import Pereval, ImagePereval, Level, Coord
 
@@ -64,54 +64,9 @@ async def submit_data_patch(
         pereval_data: PerevalUpdateFD = Depends()
 ):
     try:
-        query = select(Pereval).where(Pereval.id == pk).options(
-            selectinload(Pereval.user),
-            selectinload(Pereval.coord),
-            selectinload(Pereval.level),
-            selectinload(Pereval.images_pereval).selectinload(ImagePereval.image)
-        )
-        result = await db.execute(query)
-        pereval: Pereval = result.scalar_one_or_none()
-
-        coord: Coord = pereval.coord
-        level: Level = pereval.level
-
-        pereval.beauty_title = pereval_data.beauty_title
-        pereval.title = pereval_data.title
-        pereval.other_title = pereval_data.other_title
-        pereval.connect = pereval_data.connect
-
-        coord.latitude = pereval_data.coord.latitude
-        coord.longitude = pereval_data.coord.longitude
-        coord.height = pereval_data.coord.height
-
-        level.winter = pereval_data.level.winter
-        level.summer = pereval_data.level.summer
-        level.autumn = pereval_data.level.autumn
-        level.spring = pereval_data.level.spring
-
+        pereval: Pereval = await pereval_update(db=db, pereval_data=pereval_data, pk=pk)
         images = await image_list(image_data=pereval_data.image_data, image_title=pereval_data.image_title)
-
-        for data, instance in zip(images, pereval.images_pereval):
-            instance_file_path = os.path.join(settings.MEDIA_DIR, instance.image.data)
-
-            image = data.data
-            title = data.title
-
-            image.filename = f'{title}.{image.filename.split(".")[-1]}'
-            file_path = os.path.join(settings.MEDIA_DIR, image.filename)
-
-            if os.path.exists(file_path):
-                image.filename = f'{settings.generate_unique_value()}{image.filename}'
-                file_path = os.path.join(settings.MEDIA_DIR, image.filename)
-
-            with open(file_path, 'wb+') as file:
-                file.write(await image.read())
-
-            instance.image.data = image.filename
-            instance.image.title = title
-
-            os.remove(instance_file_path)
+        await image_update(pereval=pereval, images=images)
 
         await db.commit()
     except Exception as e:

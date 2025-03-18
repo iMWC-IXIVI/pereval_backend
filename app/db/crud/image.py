@@ -1,6 +1,6 @@
 import os
 
-from typing import Tuple
+from typing import Tuple, List
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -53,3 +53,26 @@ async def image_pereval_create(db: AsyncSession, image_data: Tuple[Image], perev
 
         await db.commit()
         await db.refresh(image_pereval)
+
+
+async def image_update(pereval: Pereval, images: List[ImageBaseFD]):
+    for data, instance in zip(images, pereval.images_pereval):
+        instance_file_path = os.path.join(settings.MEDIA_DIR, instance.image.data)
+
+        image = data.data
+        title = data.title
+
+        image.filename = f'{title}.{image.filename.split(".")[-1]}'
+        file_path = os.path.join(settings.MEDIA_DIR, image.filename)
+
+        if os.path.exists(file_path):
+            image.filename = f'{settings.generate_unique_value()}{image.filename}'
+            file_path = os.path.join(settings.MEDIA_DIR, image.filename)
+
+        with open(file_path, 'wb+') as file:
+            file.write(await image.read())
+
+        instance.image.data = image.filename
+        instance.image.title = title
+
+        os.remove(instance_file_path)
