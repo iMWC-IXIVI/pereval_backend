@@ -13,7 +13,7 @@ from core.config import settings
 
 from db.schemas.form_data import PerevalBaseFD, PerevalUpdateFD
 from db.schemas.json import PerevalRead, ImageRead
-from db.crud import image_create, pereval_create, image_pereval_create, user_information
+from db.crud import image_create, pereval_create, image_pereval_create, user_information, pereval_detail
 from db.session import get_db
 from db.models import Pereval, ImagePereval, Level, Coord
 
@@ -40,19 +40,7 @@ async def submit_data_create(db: AsyncSession = Depends(get_db), data: PerevalBa
 @router.get('/{pk}', response_model=PerevalRead, status_code=200)
 async def submit_data_detail(pk: int = Path(..., title='Primary key', ge=1), db: AsyncSession = Depends(get_db)):
     try:
-        query = select(Pereval).where(Pereval.id == pk).options(
-            selectinload(Pereval.user),
-            selectinload(Pereval.coord),
-            selectinload(Pereval.level),
-            selectinload(Pereval.images_pereval).selectinload(ImagePereval.image)
-        )
-
-        result = await db.execute(query)
-        pereval = result.scalar_one_or_none()
-
-        images = [ImageRead.model_validate(image.image) for image in pereval.images_pereval]
-        pereval_dict = PerevalRead.model_validate(pereval)
-        pereval_dict.image = images
+        pereval_dict = await pereval_detail(pk=pk, db=db)
     except Exception as e:
         return JSONResponse(content={'error': 'can\'t show detail'}, status_code=400)
 

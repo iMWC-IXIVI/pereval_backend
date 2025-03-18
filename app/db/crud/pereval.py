@@ -1,7 +1,10 @@
+from sqlalchemy.future import select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from db.models import Pereval
+from db.models import Pereval, ImagePereval
 from db.schemas.form_data import PerevalBaseFD
+from db.schemas.json import PerevalRead, ImageRead
 
 from db.crud import user_create, coord_create, level_create
 
@@ -29,3 +32,21 @@ async def pereval_create(db: AsyncSession, pereval_data: PerevalBaseFD):
     await db.refresh(pereval)
 
     return pereval
+
+
+async def pereval_detail(pk:int, db: AsyncSession):
+    query = select(Pereval).where(Pereval.id == pk).options(
+        selectinload(Pereval.user),
+        selectinload(Pereval.coord),
+        selectinload(Pereval.level),
+        selectinload(Pereval.images_pereval).selectinload(ImagePereval.image)
+    )
+
+    result = await db.execute(query)
+    pereval = result.scalar_one_or_none()
+
+    images = [ImageRead.model_validate(image.image) for image in pereval.images_pereval]
+    pereval_dict = PerevalRead.model_validate(pereval)
+    pereval_dict.image = images
+
+    return pereval_dict
