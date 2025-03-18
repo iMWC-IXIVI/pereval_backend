@@ -11,11 +11,13 @@ from sqlalchemy.future import select
 
 from core.config import settings
 
-from db.schemas.form_data import PerevalBaseFD, ImageBaseFD, PerevalUpdateFD
+from db.schemas.form_data import PerevalBaseFD, PerevalUpdateFD
 from db.schemas.json import PerevalRead, ImageRead
 from db.crud import image_create, pereval_create, image_pereval_create
 from db.session import get_db
 from db.models import Pereval, ImagePereval, User, Level, Coord
+
+from utils import image_list
 
 
 router = APIRouter(prefix='/submitData')
@@ -24,9 +26,7 @@ router = APIRouter(prefix='/submitData')
 @router.post('/', response_model=dict, status_code=201)
 async def submit_data_create(db: AsyncSession = Depends(get_db), data: PerevalBaseFD = Depends()):
     try:
-        list_image = []
-        for image, title in zip(data.image_data, data.image_title):
-            list_image.append(ImageBaseFD(data=image, title=title))
+        list_image = await image_list(image_data=data.image_data, image_title=data.image_title)
 
         image = await image_create(db=db, image_data=tuple(list_image))
         pereval = await pereval_create(db=db, pereval_data=data)
@@ -117,9 +117,7 @@ async def submit_data_patch(
         level.autumn = pereval_data.level.autumn
         level.spring = pereval_data.level.spring
 
-        images = []
-        for image, title in zip(pereval_data.image_data, pereval_data.image_title):
-            images.append(ImageBaseFD(data=image, title=title))
+        images = await image_list(image_data=pereval_data.image_data, image_title=pereval_data.image_title)
 
         for data, instance in zip(images, pereval.images_pereval):
             instance_file_path = os.path.join(settings.MEDIA_DIR, instance.image.data)
